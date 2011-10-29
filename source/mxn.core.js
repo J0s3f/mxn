@@ -1248,9 +1248,9 @@ var LatLonPoint = mxn.LatLonPoint = function(lat, lon) {
 	// TODO error if undefined?
 	//  if (lat == undefined) alert('undefined lat');
 	//  if (lon == undefined) alert('undefined lon');
-	this.lat = lat;
-	this.lon = lon;
-	this.lng = lon; // lets be lon/lng agnostic
+	this.lat = lat*1;
+	this.lon = lon*1;
+	this.lng = lon*1; // lets be lon/lng agnostic
 	
 	this.invoker = new mxn.Invoker(this, 'LatLonPoint');		
 };
