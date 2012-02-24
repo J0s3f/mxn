@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
 Copyright (c) 2011 Tom Carden, Steve Coast, Mikel Maron, Andrew Turner, Henri Bergius, Rob Moran, Derek Fowler, Gary Gale
 All rights reserved.
@@ -10,6 +11,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+=======
+>>>>>>> 2174749cd252ca509c0dd1390c5a4b101f30d8f1
 mxn.register('ovi', {
 
 Mapstraction: {
@@ -78,12 +81,15 @@ Mapstraction: {
 						eventStates.mapsize = false;
 						me.load.fire();
 					}
+				} 
+				else {
+				    if (eventStates.center) {
+						eventStates.center = false;
+						me.moveendHandler(me);
+						me.endPan.fire();
+				    }
 				}
-				if (eventStates.center) {
-					eventStates.center = false;
-					me.moveendHandler(me);
-					me.endPan.fire();
-				}
+				
 				if (eventStates.zoom) {
 					eventStates.zoom = false;
 					me.changeZoom.fire();
@@ -100,7 +106,17 @@ Mapstraction: {
 	},
 	
 	applyOptions: function() {
-		// TODO
+		var map = this.maps[this.api];
+		
+		if (this.options.enableScrollWheelZoom) {
+			map.addComponent(new ovi.mapsapi.map.component.zoom.MouseWheel());
+		} 
+		else {
+		    var mousewheel = map.getComponentById("zoom.MouseWheel");
+                    if (mousewheel){
+			map.removeComponent(mousewheel);
+		    }
+		}	
 	},
 	
 	resizeTo: function(width, height) {
@@ -147,13 +163,11 @@ Mapstraction: {
 	// style of Zoom controls so, for now, make them functionally equivalent
 	addSmallControls: function() {
 		var map = this.maps[this.api];
-		
 		map.addComponent(new ovi.mapsapi.map.component.ZoomBar());
 	},
 	
 	addLargeControls: function() {
 		var map = this.maps[this.api];
-		
 		map.addComponent(new ovi.mapsapi.map.component.ZoomBar());
 	},
 	
@@ -277,23 +291,26 @@ Mapstraction: {
 	getBounds: function() {
 		var map = this.maps[this.api];
 		var bbox = map.getViewBounds();
-		var sw = bbox.topLeft;
-		var ne = bbox.bottomRight;
-
-		return new mxn.BoundingBox(sw.latitude, sw.longitude, ne.latitude, ne.longitude);
+		var nw = bbox.topLeft;
+		var se = bbox.bottomRight;
+		
+		return new mxn.BoundingBox(se.latitude, nw.longitude, nw.latitude, se.longitude);
 	},
 	
 	setBounds: function(bounds) {
 		var map = this.maps[this.api];
-		var sw = bounds.getSouthWest().toProprietary(this.api);
-		var ne = bounds.getNorthEast().toProprietary(this.api);
-		var ovi_bb = new ovi.mapsapi.geo.BoundingBox(sw, ne);
+
+		var sw = bounds.getSouthWest();
+		var ne = bounds.getNorthEast();
+
+		var nw = new mxn.LatLonPoint(ne.lat, sw.lon).toProprietary(this.api);
+		var se = new mxn.LatLonPoint(sw.lat, ne.lon).toProprietary(this.api);
+		var ovi_bb = new ovi.mapsapi.geo.BoundingBox(nw, se);
 		var keepCentre = false;
-		
 		map.zoomTo(ovi_bb, keepCentre);
 	},
 	
-	addImageOverlay: function(id, src, poacity, west, south, east, north, oContext) {
+	addImageOverlay: function(id, src, opacity, west, south, east, north, oContext) {
 		throw 'Not implemented';
 	},
 	
